@@ -1,5 +1,13 @@
 extends layout
 
-block content
-  h1= title
-  p Welcome to #{title}
+append content
+    canvas(id="control-surface" width="100%" height="100")
+
+    div(id="selectedMode")
+
+    input(type="button" id="walkButton" value="WALK" onClick="setWalk()")
+    input(type="button" id="danceButton" value="DANCE" onClick="setDance()")
+    input(type="button" id="restButton" value="STOP" onClick="setStop()")
+
+    script(src='javascripts/rover.js')
+
