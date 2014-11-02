@@ -75,7 +75,8 @@ function setStop() {
     mode = "STOP";
     document.getElementById("selectedMode").style.left = "170px";
     document.getElementById("selectedMode").style.background = "#FFFF00";
-    socket.send("!D*\0");
+    //T/ socket.send("!D*\0");
+    socket.emit("rover", "!D*\0");
     redraw();
 }
 
@@ -105,7 +106,8 @@ function get_appropriate_ws_url() {
 }
 
 
-var socket = new WebSocket(get_appropriate_ws_url(), "controller");
+//T var socket = new WebSocket(get_appropriate_ws_url(), "controller");
+var socket = io.connect();
 
 try {
     socket.onopen = function () {
@@ -147,8 +149,8 @@ function orient_event(ev) {
     orient_roll = Math.round(orient_roll);
     
     if (!dragging && mode == "DANCE") {
-        socket.send("!DA" + orient_yaw + "B" + orient_pitch +
-                  "C" + orient_roll + "*\0");
+        //T/ socket.send("!DA" + orient_yaw + "B" + orient_pitch + "C" + orient_roll + "*\0");
+        socket.emit("rover", "!DA" + orient_yaw + "B" + orient_pitch + "C" + orient_roll + "*\0");
     }
     redraw();
   //else 
@@ -181,8 +183,8 @@ function touched_at(_x, _y) {
                 move_x = Math.round(move_x);
                 move_y = Math.round(move_y);
                 
-                socket.send("!DX" + move_x + "Y" + move_y +
-                    "Z" + -orient_pitch * 10 + "*\0");
+                //T/ socket.send("!DX" + move_x + "Y" + move_y + "Z" + -orient_pitch * 10 + "*\0");
+                socket.emit("rover", "!DX" + move_x + "Y" + move_y + "Z" + -orient_pitch * 10 + "*\0");
             }
             break;
         case "WALK":
@@ -209,7 +211,8 @@ function touched_at(_x, _y) {
                     walk_r = 0;
                 }
                 
-                socket.send("!WX" + walk_x + "Y" + walk_y + "A" + (walk_r * 10) + "*\0");
+                //T/ socket.send("!WX" + walk_x + "Y" + walk_y + "A" + (walk_r * 10) + "*\0");
+                socket.emit("rover", "!WX" + walk_x + "Y" + walk_y + "A" + (walk_r * 10) + "*\0");
                 
                 redraw();
             }

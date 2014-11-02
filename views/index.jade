@@ -9,5 +9,13 @@ append content
     input(type="button" id="danceButton" value="DANCE" onClick="setDance()")
     input(type="button" id="restButton" value="STOP" onClick="setStop()")
 
+    script(src="/socket.io/socket.io.js")
+    script(type='text/javascript').
+        var socket = io.connect();
+        socket.on('news', function (data) {
+            console.log(data);
+            socket.emit('my other event', { my: 'data' });
+        });
+
     script(src='javascripts/rover.js')
 
