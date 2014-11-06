@@ -1,25 +1,40 @@
 doctype html
 html(lang="en")
-  head
-    title= title
-    meta(charset='utf-8')
-    meta(name="viewport" content="width=device-width; initial-scale=1.3; maximum-scale=1.3; user-scalable=no;")
-    meta(name="apple-mobile-web-app-capable" content="yes")
-    meta(name="apple-mobile-web-app-status-bar-style" content="black")
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    script(type='text/javascript').
-        window.onload = function() {
-            // Disable scrolling on iPhone, etc
-            document.body.addEventListener('touchmove', function(e) { e.preventDefault(); });
-            document.body.addEventListener('touchdown', function(e) { e.preventDefault(); });
-            window.onresize();
-        }
+	head
+		title= title
+		meta(charset='utf-8')
+		meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui")
+		meta(name="apple-mobile-web-app-capable" content="yes")
+		meta(name="apple-mobile-web-app-status-bar-style" content="black")
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		script(type='text/javascript').
+			window.onload = function() {
+			// Disable scrolling on iPhone, etc
+			document.body.addEventListener('touchmove', function(e) { e.preventDefault(); });
+			document.body.addEventListener('touchdown', function(e) { e.preventDefault(); });
+			window.onresize();
+			}
 
-        window.onresize = function() {
-            var control_canvas = document.getElementById("control-surface");
-            control_canvas.width = window.innerWidth;
-            control_canvas.height = window.innerHeight;
-            redraw();
-        }
-  body
-    block content
+			window.onresize = function() {
+				var canvasElement = document.getElementById("rover-canvas");
+				canvasElement.width = window.innerWidth;
+				canvasElement.height = window.innerHeight;
+				redraw();
+			}
+
+			///
+			function hideAddressBar() {
+				if(!window.location.hash) {
+					if(document.height < window.outerHeight) {
+						document.body.style.height = (window.outerHeight + 50) + 'px';
+					}
+
+				setTimeout( function(){ window.scrollTo(0, 1); }, 50 );
+				}
+			}
+
+			window.addEventListener("load", function(){ if(!window.pageYOffset){ hideAddressBar(); } } );
+			window.addEventListener("orientationchange", hideAddressBar );
+			///
+	body
+		block content

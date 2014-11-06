@@ -1,21 +1,22 @@
 extends layout
 
 append content
-    canvas(id="control-surface" width="100%" height="100")
+	#info
+	canvas(id="rover-canvas" width="100%" height="100")
 
-    div(id="selectedMode")
+	#buttons
+		input#walkButton(type="button" value="WALK" onClick="setWalk()")
+		input#danceButton(type="button" value="DANCE" onClick="setDance()")
+		input#restButton.selected(type="button" value="STOP" onClick="setStop()")
 
-    input(type="button" id="walkButton" value="WALK" onClick="setWalk()")
-    input(type="button" id="danceButton" value="DANCE" onClick="setDance()")
-    input(type="button" id="restButton" value="STOP" onClick="setStop()")
-
-    script(src="/socket.io/socket.io.js")
-    script(type='text/javascript').
-        var socket = io.connect();
-        socket.on('news', function (data) {
-            console.log(data);
-            socket.emit('my other event', { my: 'data' });
-        });
-
-    script(src='javascripts/rover.js')
+	script(src="/socket.io/socket.io.js")
+	script(type='text/javascript').
+		var socket = io.connect();
+		socket.on('news', function (data) {
+			console.log(data);
+			socket.emit('my other event', { my: 'data' });
+		});
+		
+	script(src='javascripts/rover-utilities.js')
+	script(src='javascripts/rover.js')
 

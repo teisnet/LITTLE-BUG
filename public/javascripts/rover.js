@@ -1,82 +1,126 @@
-﻿var width = window.innerWidth;
-var height = window.innerHeight;
+﻿var width = -1; //window.innerWidth;
+var height = -1; //window.innerHeight;
 var dragging = false;
 var mode = "STOP";
 
-var control_canvas = document.getElementById("control-surface");
-control_canvas.width = width;
-control_canvas.height = height;
-var ctx = control_canvas.getContext("2d");
+var fullWidth = -1;
+var fullHeight = -1;
+
+var canvasElement = document.getElementById("rover-canvas");
+//canvasElement.width = width;
+//canvasElement.height = height;
+
+//log("Window: width = " + width + ", height = " + height);
+
+var ctx = canvasElement.getContext("2d");
+var q = 0;
+
+resize(ctx, window.innerWidth, window.innerHeight);
 
 function redraw() {
-    ctx.fillStyle = "#202020";
-    ctx.fillRect(0, 0, control_canvas.width, control_canvas.height);
-    
-    
-    ctx.lineWidth = 10;
+	// Background
+    //ctx.fillStyle = colors.background;
+	//ctx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+	ctx.clearRect(0 , 0 , canvasElement.width , canvasElement.height);
+	
+	//width = window.innerWidth;
+	//height = window.innerHeight;
+
+	//if (fullWidth != window.innerWidth || fullHeight != window.innerHeight) {
+		fullWidth = window.innerWidth;
+		fullHeight = window.innerHeight;
+		resize(ctx, fullWidth, fullHeight);
+		width = fullWidth;
+		height = - 50 + fullHeight; // - 100;
+		//height = fullHeight;
+		//log(window.devicePixelRatio);
+	//}
+
+
+	//ctx.translate(0.5, 0.5); // Should make sharp graphics
+
+    ctx.lineWidth = 30;
     if (mode == "WALK") {
-        ctx.strokeStyle = "#FFFF00";
+        ctx.strokeStyle = colors.overflowArrow;
         ctx.beginPath();
         if (walk_r > 0) {
-            ctx.arc(width / 2, height / 2, 24, -Math.PI / 2,
+            ctx.arc(width / 2, height / 2, 40, -Math.PI / 2,
                                      -Math.PI / 2 + (walk_r / 50), false);
         }
         else {
-            ctx.arc(width / 2, height / 2, 24, -Math.PI / 2 + (walk_r / 50),
+            ctx.arc(width / 2, height / 2, 40, -Math.PI / 2 + (walk_r / 50),
                                      -Math.PI / 2, false);
         }
         //ctx.closePath();
         ctx.stroke();
     }
-    
-    ctx.fillStyle = "#0088FF";
-    ctx.beginPath();
-    ctx.arc(width / 2, height / 2, 20, 0, Math.PI * 2, true);
-    ctx.closePath();
-    ctx.fill();
-    
-    ctx.strokeStyle = "#FF0088";
-    ctx.beginPath();
-    ctx.moveTo(width / 2, height / 2);
-    if (mode == "WALK")
-        ctx.lineTo(width / 2 - walk_x / 40, height / 2 - walk_y / 40);
+	ctx.lineWidth = 15;
 
-    else if (mode == "DANCE")
-        ctx.lineTo(width / 2 + orient_roll, height / 2 - orient_pitch);
-    
-    ctx.stroke();
+    ctx.fillStyle = colors.rover;
+	ctx.beginPath();
+    // ctx.arc(width / 2, height / 2, 20, 0, Math.PI * 2, true);
+    // ctx.closePath();
+	hexagon(ctx, width / 2, height / 2, 40);
+	ctx.fill();
+	
+	if (mode === "WALK" || mode === "DANCE") {
+		
+		var xPos = 0, yPos = 0;
+		if (mode === "WALK") {
+			xPos = width / 2 - walk_x / 40;
+			yPos = height / 2 - walk_y / 40;
+		} else if (mode === "DANCE") {
+			xPos = width / 2 + orient_roll;
+			yPos = height / 2 - orient_pitch;
+		}
+		
+		// LINE
+		ctx.strokeStyle = colors.walkArrow;
+		ctx.beginPath();
+		ctx.moveTo(width / 2, height / 2);
+		ctx.lineTo(xPos, yPos);
+		ctx.stroke();
+		
+		// CIRCLE
+		var radius = 10;
+		ctx.beginPath();
+		ctx.arc(xPos, yPos, radius, 0, 2 * Math.PI, false);
+		ctx.fillStyle = colors.rover;
+		ctx.fill();
+		ctx.lineWidth = 5;
+		ctx.strokeStyle = colors.background;
+		ctx.stroke();
+	}
 }
 
 redraw();
 
-control_canvas.addEventListener('mousemove', move_event, false);
-control_canvas.addEventListener('mousedown', down_event, false);
-control_canvas.addEventListener('mouseup', up_event, false);
-control_canvas.addEventListener('touchend', up_event, false);
-control_canvas.addEventListener('touchstart', touch_move_event, false);
-control_canvas.addEventListener('touchmove', touch_move_event, false);
+
+canvasElement.addEventListener('mousemove', move_event, false);
+canvasElement.addEventListener('mousedown', down_event, false);
+canvasElement.addEventListener('mouseup', up_event, false);
+canvasElement.addEventListener('touchend', up_event, false);
+canvasElement.addEventListener('touchstart', touch_move_event, false);
+canvasElement.addEventListener('touchmove', touch_move_event, false);
 window.addEventListener('deviceorientation', orient_event, false);
 
 function setWalk() {
-    mode = "WALK";
-    document.getElementById("selectedMode").style.left = "0px";
-    document.getElementById("selectedMode").style.background = "#0088FF";
+	mode = "WALK";
+	setSelected(mode);
     redraw();
 }
 
 function setDance() {
-    mode = "DANCE";
-    document.getElementById("selectedMode").style.left = "85px";
-    document.getElementById("selectedMode").style.background = "#FF0088";
+	mode = "DANCE";
+	setSelected(mode);
     redraw();
 }
 
 function setStop() {
-    mode = "STOP";
-    document.getElementById("selectedMode").style.left = "170px";
-    document.getElementById("selectedMode").style.background = "#FFFF00";
-    //T/ socket.send("!D*\0");
-    socket.emit("rover", "!D*\0");
+	mode = "STOP";
+	setSelected(mode);
+	//T/ socket.send("!D*\0");
+	sendCommand("!D*\0");
     redraw();
 }
 
@@ -107,7 +151,6 @@ function get_appropriate_ws_url() {
 
 
 //T var socket = new WebSocket(get_appropriate_ws_url(), "controller");
-var socket = io.connect();
 
 try {
     socket.onopen = function () {
@@ -149,8 +192,8 @@ function orient_event(ev) {
     orient_roll = Math.round(orient_roll);
     
     if (!dragging && mode == "DANCE") {
-        //T/ socket.send("!DA" + orient_yaw + "B" + orient_pitch + "C" + orient_roll + "*\0");
-        socket.emit("rover", "!DA" + orient_yaw + "B" + orient_pitch + "C" + orient_roll + "*\0");
+		//T/ socket.send("!DA" + orient_yaw + "B" + orient_pitch + "C" + orient_roll + "*\0");
+		sendCommand("!DA" + orient_yaw + "B" + orient_pitch + "C" + orient_roll + "*\0");
     }
     redraw();
   //else 
@@ -184,7 +227,7 @@ function touched_at(_x, _y) {
                 move_y = Math.round(move_y);
                 
                 //T/ socket.send("!DX" + move_x + "Y" + move_y + "Z" + -orient_pitch * 10 + "*\0");
-                socket.emit("rover", "!DX" + move_x + "Y" + move_y + "Z" + -orient_pitch * 10 + "*\0");
+				sendCommand("!DX" + move_x + "Y" + move_y + "Z" + -orient_pitch * 10 + "*\0");
             }
             break;
         case "WALK":
@@ -196,9 +239,8 @@ function touched_at(_x, _y) {
                     if (walk_r < -60) walk_r = -60;
                     walk_x = 0;
                     walk_y = 0;
-        //walk_r *= 10;
-                }
-                else {
+					//walk_r *= 10;
+                } else {
                     var dX = Math.round(-(_x - width / 2) * 40);
                     var dY = Math.round(-(_y - height / 2) * 40);
                     if (isNaN(dX) || isNaN(dY)) return;
@@ -211,9 +253,8 @@ function touched_at(_x, _y) {
                     walk_r = 0;
                 }
                 
-                //T/ socket.send("!WX" + walk_x + "Y" + walk_y + "A" + (walk_r * 10) + "*\0");
-                socket.emit("rover", "!WX" + walk_x + "Y" + walk_y + "A" + (walk_r * 10) + "*\0");
-                
+				//T/ socket.send("!WX" + walk_x + "Y" + walk_y + "A" + (walk_r * 10) + "*\0");
+				sendCommand("!WX" + walk_x + "Y" + walk_y + "A" + (walk_r * 10) + "*\0");
                 redraw();
             }
     }
