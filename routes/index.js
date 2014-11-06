@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res) {
-  res.render('index', { title: 'PUBLIC SPACE ROVER COMMAND CENTER' });
+  res.render('index', { title: 'LITTLE BUG' });
 });
 
 module.exports = router;
