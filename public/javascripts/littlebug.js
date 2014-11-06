@@ -38,7 +38,8 @@ function redraw() {
 
 
 	//ctx.translate(0.5, 0.5); // Should make sharp graphics
-
+	
+	// DRAW WALK DIRECTION
     ctx.lineWidth = 30;
     if (mode == "WALK") {
         ctx.strokeStyle = colors.overflowArrow;
@@ -53,16 +54,21 @@ function redraw() {
         }
         //ctx.closePath();
         ctx.stroke();
-    }
-	ctx.lineWidth = 15;
+	}
+	
+	// DRAW LITTLE BUG BODY
+	ctx.lineWidth = 1;
 
-    ctx.fillStyle = colors.rover;
+	ctx.fillStyle = "white";
+	ctx.strokeStyle = colors.rover;
 	ctx.beginPath();
     // ctx.arc(width / 2, height / 2, 20, 0, Math.PI * 2, true);
     // ctx.closePath();
 	hexagon(ctx, width / 2, height / 2, 40);
 	ctx.fill();
+	ctx.stroke();
 	
+
 	if (mode === "WALK" || mode === "DANCE") {
 		
 		var xPos = 0, yPos = 0;
@@ -75,6 +81,7 @@ function redraw() {
 		}
 		
 		// LINE
+		ctx.lineWidth = 3;
 		ctx.strokeStyle = colors.walkArrow;
 		ctx.beginPath();
 		ctx.moveTo(width / 2, height / 2);
@@ -85,9 +92,9 @@ function redraw() {
 		var radius = 10;
 		ctx.beginPath();
 		ctx.arc(xPos, yPos, radius, 0, 2 * Math.PI, false);
-		ctx.fillStyle = colors.rover;
+		ctx.fillStyle = "white";
 		ctx.fill();
-		ctx.lineWidth = 5;
+		ctx.lineWidth = 3;
 		ctx.strokeStyle = colors.background;
 		ctx.stroke();
 	}

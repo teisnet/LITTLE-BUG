@@ -1,12 +1,16 @@
 ﻿var buttonElements = { WALK: "walkButton", DANCE: "danceButton", STOP: "restButton" };
 
 var colors = {
-	rover: "#FFFFFF",			//"#0088FF",
+	rover: "gray",			//"#0088FF",
 	overflowArrow: "#FF0000",	//"#FFFF00",
-	walkArrow: "#FFFFFF",		//"#FF0088"
+	walkArrow: "black",		//"#FF0088"
 	walkOuter: "#000000",
 	background: "#000000"
 }
+
+
+
+
 
 var socket = io.connect();
 
