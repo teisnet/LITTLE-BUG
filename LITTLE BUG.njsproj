@@ -23,8 +23,8 @@
     <Content Include="package.json" />
     <Compile Include="app.js" />
     <Compile Include="bin\www.js" />
-    <Compile Include="public\javascripts\rover-utilities.js" />
-    <Compile Include="public\javascripts\rover.js" />
+    <Compile Include="public\javascripts\littlebug-utilities.js" />
+    <Compile Include="public\javascripts\littlebug.js" />
     <Compile Include="routes\index.js" />
     <Content Include="views\error.jade" />
     <Content Include="views\index.jade" />
