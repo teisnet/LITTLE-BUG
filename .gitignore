@@ -4,8 +4,7 @@ logs/*
 
 **/.ntvs_analysis.dat
 *.suo
-
-node_modules/less-middleware/node_modules/less/node_modules/request/node_modules/form-data/node_modules/combined-stream/node_modules/*
+node_modules
 
 =======
 # Logs
