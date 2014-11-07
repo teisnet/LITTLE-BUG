@@ -13,12 +13,8 @@ var server = app.listen(app.get('port'), function() {
 var io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
-    socket.emit('news', { hello: 'world' });
-    socket.on('rover', function (data) {
-        console.log(data);
-    });
-    
-    socket.on('', function (data) {
-        console.log(data);
+    socket.on('bot', function (data) {
+		console.log(data);
+		socket.volatile.broadcast.emit('bot', data);
     });
 });

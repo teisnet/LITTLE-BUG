@@ -26,7 +26,7 @@ function redraw() {
 	//width = window.innerWidth;
 	//height = window.innerHeight;
 
-	//if (fullWidth != window.innerWidth || fullHeight != window.innerHeight) {
+	if (fullWidth != window.innerWidth || fullHeight != window.innerHeight) {
 		fullWidth = window.innerWidth;
 		fullHeight = window.innerHeight;
 		resize(ctx, fullWidth, fullHeight);
@@ -34,22 +34,22 @@ function redraw() {
 		height = - 50 + fullHeight; // - 100;
 		//height = fullHeight;
 		//log(window.devicePixelRatio);
-	//}
+	}
 
 
 	//ctx.translate(0.5, 0.5); // Should make sharp graphics
 	
-	// DRAW WALK DIRECTION
+	// DRAW ROTATION
     ctx.lineWidth = 30;
     if (mode == "WALK") {
         ctx.strokeStyle = colors.overflowArrow;
         ctx.beginPath();
-        if (walk_r > 0) {
+		if (walk_r > 0) {
             ctx.arc(width / 2, height / 2, 40, -Math.PI / 2,
                                      -Math.PI / 2 + (walk_r / 50), false);
-        }
-        else {
-            ctx.arc(width / 2, height / 2, 40, -Math.PI / 2 + (walk_r / 50),
+        } else {
+			ctx.arc(width / 2, height / 2, 40,
+				-Math.PI / 2 + (walk_r / 50),
                                      -Math.PI / 2, false);
         }
         //ctx.closePath();
@@ -68,7 +68,7 @@ function redraw() {
 	ctx.fill();
 	ctx.stroke();
 	
-
+	// DRAW DIRECTION LINE AND CIRCLE
 	if (mode === "WALK" || mode === "DANCE") {
 		
 		var xPos = 0, yPos = 0;
@@ -76,8 +76,8 @@ function redraw() {
 			xPos = width / 2 - walk_x / 40;
 			yPos = height / 2 - walk_y / 40;
 		} else if (mode === "DANCE") {
-			xPos = width / 2 + orient_roll;
-			yPos = height / 2 - orient_pitch;
+			xPos = width / 2 - orient_roll;
+			yPos = height / 2 + orient_pitch;
 		}
 		
 		// LINE
@@ -111,7 +111,7 @@ canvasElement.addEventListener('touchstart', touch_move_event, false);
 canvasElement.addEventListener('touchmove', touch_move_event, false);
 window.addEventListener('deviceorientation', orient_event, false);
 
-function setWalk() {
+function setWalk(local) {
 	mode = "WALK";
 	setSelected(mode);
     redraw();
@@ -123,37 +123,13 @@ function setDance() {
     redraw();
 }
 
-function setStop() {
+function setStop(local) {
 	mode = "STOP";
 	setSelected(mode);
 	//T/ socket.send("!D*\0");
-	sendCommand("!D*\0");
+	if (!local)
+		sendCommand("!D*\0");
     redraw();
-}
-
-
-
-function get_appropriate_ws_url() {
-    var pcol;
-    var u = document.URL;
-    
-    /*
-	 * We open the websocket encrypted if this page came on an
-	 * https:// url itself, otherwise unencrypted
-	 */
-
-	if (u.substring(0, 5) == "https") {
-        pcol = "wss://";
-        u = u.substr(8);
-    } else {
-        pcol = "ws://";
-        if (u.substring(0, 4) == "http")
-            u = u.substr(7);
-    }
-    
-    u = u.split('/');
-    
-    return pcol + u[0];
 }
 
 
@@ -172,7 +148,7 @@ try {
   
     }
 } catch (exception) {
-    alert('<p>Error' + exception);
+    alert('Error' + exception);
 }
 
 var orient_yaw = 0;
@@ -199,12 +175,11 @@ function orient_event(ev) {
     orient_roll = Math.round(orient_roll);
     
     if (!dragging && mode == "DANCE") {
-		//T/ socket.send("!DA" + orient_yaw + "B" + orient_pitch + "C" + orient_roll + "*\0");
-		sendCommand("!DA" + orient_yaw + "B" + orient_pitch + "C" + orient_roll + "*\0");
+		sendCommand("!DA" + orient_yaw + "B" + orient_pitch + "C" + orient_roll + "*\0", true);
     }
     redraw();
   //else 
-  //  socket.send("!DX" + move_x + "Y" + move_y + "Z" + -orient_pitch*10+ "*\0");
+  //  sendCommand("!DX" + move_x + "Y" + move_y + "Z" + (-orient_pitch * 10) + "*\0");
 }
 
 var move_x = 0;
@@ -233,8 +208,7 @@ function touched_at(_x, _y) {
                 move_x = Math.round(move_x);
                 move_y = Math.round(move_y);
                 
-                //T/ socket.send("!DX" + move_x + "Y" + move_y + "Z" + -orient_pitch * 10 + "*\0");
-				sendCommand("!DX" + move_x + "Y" + move_y + "Z" + -orient_pitch * 10 + "*\0");
+				sendCommand("!DX" + move_x + "Y" + move_y + "Z" + -orient_pitch * 10 + "*\0", true);
             }
             break;
         case "WALK":
@@ -260,8 +234,7 @@ function touched_at(_x, _y) {
                     walk_r = 0;
                 }
                 
-				//T/ socket.send("!WX" + walk_x + "Y" + walk_y + "A" + (walk_r * 10) + "*\0");
-				sendCommand("!WX" + walk_x + "Y" + walk_y + "A" + (walk_r * 10) + "*\0");
+				sendCommand("!WX" + walk_x + "Y" + walk_y + "A" + (walk_r * 10) + "*\0", true);
                 redraw();
             }
     }

@@ -9,28 +9,73 @@ var colors = {
 }
 
 
-
-
-
 var socket = io.connect();
 
+var sendCommandCount = 0;
+var lastCommandTime = new Date();
+
 function sendCommand(command) {
-	socket.emit("rover", command);
-	log(command);
+	var currentTime = new Date();
+	// TODO: Force new command types (eg. STOP)
+	if (currentTime - lastCommandTime > 50) {
+		socket.emit("bot", command);
+		log("Sending " + command + "(" + sendCommandCount++ + ")");
+		lastCommandTime = currentTime;
+	}
 }
+
+var walkExp = /^DX-?\d*Y-?\d*A\d*\*!$/i;
+
+var recieveCommandCount = 0;
+
+socket.on("bot", function (command) {
+	log("Recieving " + command + "(" + recieveCommandCount++ +")");
+	//console.log("Command: " + command);
+	//console.log("WalkMatch: " + command.match(walkExp));
+	/// /^$DX-?\d*Y-?\d*A\d*\*!$/i
+	if (command.match(/^!D\*/i)) {
+		//console.log("Command: STOP");
+		if (mode !== "STOP")
+			setStop(true);
+	} else if (command.match(/^!W/i)) {
+		var walkMatch = command.match(/^!WX(-?\d*)Y(-?\d*)A(-?\d*)\*/i);
+		if (walkMatch) {
+			//console.log("WALK: X = " + walkMatch[1] + ", Y = " + walkMatch[2] + ", A = " + walkMatch[3]);
+			if (mode !== "WALK")
+				setWalk();
+			walk_x = walkMatch[1];
+			walk_y = walkMatch[2];
+			walk_r = 0.1 * walkMatch[3];
+			redraw();
+		}
+	} else if (command.match(/^!D/i)) {
+		var danceMatch = command.match(/^!DA(-?\d*)B(-?\d*)C(-?\d*)\*/i);
+		if (danceMatch) {
+			if (mode !== "DANCE")
+				setDance();
+			//console.log("DANCE: A = " + danceMatch[1] + ", B = " + danceMatch[2] + ", C = " + danceMatch[3]);
+			orient_yaw = Number(danceMatch[1]);
+			orient_pitch = Number(danceMatch[2]);
+			orient_roll = Number(danceMatch[3]);
+			redraw();
+		}
+	}
+	
+});
 
 function log(message) {
 	document.getElementById("info").innerHTML =	 message;
 }
 
 function setSelected(mode) {
-	
+	// Remove the 'selected' from previous selected button.
 	for (var key in buttonElements) {
 		if (!buttonElements.hasOwnProperty(key)) { continue; }
 		var removeSelectedElement = buttonElements[key];
 		document.getElementById(removeSelectedElement).className = document.getElementById(removeSelectedElement).className.replace(/(?:^|\s)selected(?!\S)/g , ''); // Remove class 'selected' from the classes of the element.
 	}
 	
+	// Set the 'selected' class on the button element.
 	document.getElementById(buttonElements[mode]).className += " selected";
 }
 
@@ -56,7 +101,9 @@ function hexagon(ctx, x, y, radius) {
 
 var n = 0;
 
+var resizeCount = 0;
 function resize(ctx, width, height) {
+	console.log("Resize count = " + resizeCount++);
 	if (window.devicePixelRatio === 2) {
 		// Retina displays goes here
 
