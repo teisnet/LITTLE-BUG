@@ -2,7 +2,11 @@
 var debug = require('debug')('EARTH ROWER NODEJS');
 var app = require('../app');
 
-app.set('port', process.env.PORT || 3000);
+var littlebug = require('../littlebug');
+
+console.log("Starting LITTLE BUG web server on port  " + process.env.PORT || 3003);
+
+app.set('port', process.env.PORT || 3003);
 
 var server = app.listen(app.get('port'), function() {
   debug('Express server listening on port ' + server.address().port);
@@ -14,7 +18,7 @@ var io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
     socket.on('bot', function (data) {
-		console.log(data);
+		littlebug.send(data);
 		socket.volatile.broadcast.emit('bot', data);
     });
 });
