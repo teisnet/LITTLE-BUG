@@ -17,7 +17,14 @@ var lastCommandTime = new Date();
 function sendCommand(command) {
 	var currentTime = new Date();
 	// TODO: Force new command types (eg. STOP)
-	if (currentTime - lastCommandTime > 50) {
+	if (command === "!D*\0") {
+		socket.emit("bot", command);
+		log("Sending STOP " + command + "(" + sendCommandCount++ + ")");
+		lastCommandTime = currentTime;
+		return;
+	} 
+	
+	if (currentTime - lastCommandTime > 100) {
 		socket.emit("bot", command);
 		log("Sending " + command + "(" + sendCommandCount++ + ")");
 		lastCommandTime = currentTime;
