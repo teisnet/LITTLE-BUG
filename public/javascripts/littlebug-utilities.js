@@ -139,6 +139,21 @@ function resize(ctx, width, height) {
 
 // STATUS
 
+var lastPingTime = -1;
+socket.on("ping", function(){
+	
+	if (serverStatus === "offline") { setStatus("online"); }
+	
+	var currentPingTime = lastPingTime = new Date();
+	setTimeout(function(){
+		if (lastPingTime === currentPingTime) {
+			console.log("Ping timed out");
+			setStatus("offline");
+		}
+	}, 8000);
+});
+
+
 socket.on("connect", function() {
 	setStatus("online");
 });

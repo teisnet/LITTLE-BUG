@@ -16,6 +16,11 @@ var server = app.listen(app.get('port'), function() {
 // Socket.io
 var io = require('socket.io')(server);
 
+//io.set("heartbeat interval", 20);
+//io.set("close timeout", 10);
+//io.set("heartbeat timeout", 40);
+
+
 littlebug.io = io;
 
 io.on('connection', function (socket) {
@@ -29,3 +34,11 @@ io.on('connection', function (socket) {
 		socket.volatile.broadcast.emit('bot', data);
     });
 });
+
+
+ping();
+
+function ping() {
+    io.emit('ping');
+    setTimeout(function(){ ping() }, 5000);
+}
