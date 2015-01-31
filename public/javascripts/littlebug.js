@@ -1,4 +1,4 @@
-﻿var width = -1; //window.innerWidth;
+var width = -1; //window.innerWidth;
 var height = -1; //window.innerHeight;
 var dragging = false;
 var mode = "STOP";

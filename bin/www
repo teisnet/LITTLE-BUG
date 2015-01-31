@@ -16,7 +16,14 @@ var server = app.listen(app.get('port'), function() {
 // Socket.io
 var io = require('socket.io')(server);
 
+littlebug.io = io;
+
 io.on('connection', function (socket) {
+    
+    if(littlebug.error) {
+        socket.emit('boterror', littlebug.error.message);
+    }
+    
     socket.on('bot', function (data) {
 		littlebug.send(data);
 		socket.volatile.broadcast.emit('bot', data);

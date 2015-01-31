@@ -1,4 +1,4 @@
-﻿var buttonElements = { WALK: "walkButton", DANCE: "danceButton", STOP: "restButton" };
+var buttonElements = { WALK: "walkButton", DANCE: "danceButton", STOP: "restButton" };
 
 var colors = {
 	rover: "gray",			//"#0088FF",
@@ -134,4 +134,48 @@ function resize(ctx, width, height) {
 	
 	ctx.translate(0.5, 0.5); // Should make sharp graphics?
 	
+}
+
+
+// STATUS
+
+socket.on("connect", function() {
+	setStatus("online");
+});
+
+
+socket.on("disconnect", function() {
+	setStatus("offline");
+});
+
+
+socket.on('boterror', function (value) {
+	value ? setStatus("error") : setStatus("online");
+});
+
+
+var serverConnected = true;
+var serverStatus = "online";
+
+function setStatus(status) {
+	switch (status)
+	{
+		case "online":
+			serverStatus = "online";
+			serverConnected = true;
+			document.getElementById("status").className = "online";
+			document.getElementById("status-text").innerHTML = "ONLINE";
+			break;
+		case "offline":
+			serverStatus = "offline";
+			serverConnected = false;
+			document.getElementById("status").className = "offline";
+			document.getElementById("status-text").innerHTML = "OFFLINE";
+			break;
+		case "error":
+			serverStatus = "error";
+			serverConnected = true;
+			document.getElementById("status").className = "error";
+			document.getElementById("status-text").innerHTML = "ROBOT MALFUNCTION";
+	}
 }

@@ -1,4 +1,5 @@
 html, body {
+    font-size: 12px;
     padding: 0px;
     margin: 0px;
     font-family: Arial, Helvetica, sans-serif;
@@ -7,6 +8,8 @@ html, body {
     height: 150%;
     border: 0;
     overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 p {
@@ -18,6 +21,43 @@ p {
     margin: 5px;
     position: absolute;
     color: gray;
+}
+
+
+#status {
+    #status-text {
+        line-height: 20px;
+        position: absolute;
+        right: 40px;
+        top: 10px;
+        text-align: right;
+        font-weight: bold;
+    }
+    
+    #status-icon {
+        position: absolute;
+        background-color: yellow;
+        width: 20px;
+        height: 20px;
+        right: 10px;
+        top: 10px;
+        border-radius: 10px;
+    }
+    
+    &.online {
+        //#status-text:after { content: "ONLINE"; }
+        #status-icon { background-color: #00FF00; /* Green*/ }
+    }
+    
+    &.offline {
+        //#status-text:after { content: "OFFLINE"; }
+        #status-icon { background-color: red; }
+    }
+    
+    &.error {
+        //#status-text:after { content: "ERROR"; }
+        #status-icon { background-color: red; }
+    }
 }
 
 canvas {
